@@ -1,14 +1,6 @@
 // app/(auth)/registro/page.tsx
 import { Metadata } from "next";
 import RegisterForm from "@/components/auth/RegisterForm";
-import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
-
-export const metadata: Metadata = generateSEOMetadata({
-  title: "Crear Cuenta",
-  description:
-    "Crea tu cuenta en Eleganza y disfruta de una experiencia de compra única",
-  noIndex: true,
-});
 
 export default function RegisterPage() {
   return (

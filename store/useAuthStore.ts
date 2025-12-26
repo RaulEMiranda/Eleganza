@@ -11,6 +11,7 @@ import {
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
+  AuthError,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -34,6 +35,16 @@ interface AuthStore {
   logout: () => Promise<void>;
   initializeAuth: () => () => void;
 }
+
+// Helper para verificar si es un error de Firebase Auth
+const isAuthError = (error: unknown): error is AuthError => {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    "message" in error
+  );
+};
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -87,10 +98,13 @@ export const useAuthStore = create<AuthStore>()(
           } else {
             set({ isLoading: false });
           }
-        } catch (error: any) {
-          set({ isLoading: false, error: error.message });
+        } catch (error) {
+          const errorMessage = isAuthError(error)
+            ? error.message
+            : "Error desconocido";
+          set({ isLoading: false, error: errorMessage });
 
-          const errorMessages: { [key: string]: string } = {
+          const errorMessages: Record<string, string> = {
             "auth/user-not-found": "No existe una cuenta con este correo",
             "auth/wrong-password": "Contraseña incorrecta",
             "auth/invalid-email": "El correo electrónico no es válido",
@@ -99,8 +113,9 @@ export const useAuthStore = create<AuthStore>()(
             "auth/invalid-credential": "Credenciales inválidas",
           };
 
-          const message =
-            errorMessages[error.code] || "Error al iniciar sesión";
+          const message = isAuthError(error)
+            ? errorMessages[error.code] || "Error al iniciar sesión"
+            : "Error al iniciar sesión";
           toast.error(message);
           throw error;
         }
@@ -180,10 +195,16 @@ export const useAuthStore = create<AuthStore>()(
           }
 
           toast.success("¡Bienvenido!");
-        } catch (error: any) {
-          set({ isLoading: false, error: error.message });
+        } catch (error) {
+          const errorMessage = isAuthError(error)
+            ? error.message
+            : "Error desconocido";
+          set({ isLoading: false, error: errorMessage });
 
-          if (error.code !== "auth/popup-closed-by-user") {
+          if (
+            !isAuthError(error) ||
+            error.code !== "auth/popup-closed-by-user"
+          ) {
             toast.error("Error al iniciar sesión con Google");
           }
           throw error;
@@ -234,18 +255,22 @@ export const useAuthStore = create<AuthStore>()(
           });
 
           toast.success("¡Cuenta creada exitosamente!");
-        } catch (error: any) {
-          set({ isLoading: false, error: error.message });
+        } catch (error) {
+          const errorMessage = isAuthError(error)
+            ? error.message
+            : "Error desconocido";
+          set({ isLoading: false, error: errorMessage });
 
-          const errorMessages: { [key: string]: string } = {
+          const errorMessages: Record<string, string> = {
             "auth/email-already-in-use": "Este correo ya está registrado",
             "auth/invalid-email": "El correo electrónico no es válido",
             "auth/weak-password":
               "La contraseña debe tener al menos 6 caracteres",
           };
 
-          const message =
-            errorMessages[error.code] || "Error al crear la cuenta";
+          const message = isAuthError(error)
+            ? errorMessages[error.code] || "Error al crear la cuenta"
+            : "Error al crear la cuenta";
           toast.error(message);
           throw error;
         }
@@ -257,8 +282,11 @@ export const useAuthStore = create<AuthStore>()(
           await signOut(auth);
           set({ user: null, isAuthenticated: false, error: null });
           toast.success("Sesión cerrada");
-        } catch (error: any) {
-          set({ error: error.message });
+        } catch (error) {
+          const errorMessage = isAuthError(error)
+            ? error.message
+            : "Error desconocido";
+          set({ error: errorMessage });
           toast.error("Error al cerrar sesión");
           throw error;
         }

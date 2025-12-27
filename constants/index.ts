@@ -110,10 +110,9 @@ export const FOOTER_LINKS = {
 
 // Filtros de ordenamiento
 export const SORT_OPTIONS = [
-  { label: "Más Relevante", value: "relevant" },
   { label: "Precio: Menor a Mayor", value: "price-asc" },
   { label: "Precio: Mayor a Menor", value: "price-desc" },
-  { label: "Más Nuevos", value: "newest" },
   { label: "Más Vendidos", value: "popular" },
+  { label: "Más Nuevos", value: "newest" },
   { label: "Mejor Valorados", value: "rating" },
 ];

@@ -1,45 +1,66 @@
-// components/ui/Badge.tsx
+// components/ui/Skeleton.tsx
 "use client";
 
-import { HTMLAttributes, forwardRef } from "react";
+import { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: "default" | "outline" | "success" | "warning" | "danger";
-  size?: "sm" | "md" | "lg";
+export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
+  variant?: "text" | "rectangular" | "circular";
+  animation?: "pulse" | "wave" | "none";
 }
 
-const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant = "default", size = "md", ...props }, ref) => {
-    const variants = {
-      default: "bg-black text-white",
-      outline: "border border-black text-black bg-white",
-      success: "bg-green-600 text-white",
-      warning: "bg-yellow-500 text-black",
-      danger: "bg-red-600 text-white",
-    };
+export default function Skeleton({
+  className,
+  variant = "rectangular",
+  animation = "pulse",
+  ...props
+}: SkeletonProps) {
+  const variants = {
+    text: "h-4",
+    rectangular: "w-full h-full",
+    circular: "rounded-full",
+  };
 
-    const sizes = {
-      sm: "px-2 py-0.5 text-xs",
-      md: "px-3 py-1 text-sm",
-      lg: "px-4 py-1.5 text-base",
-    };
+  const animations = {
+    pulse: "animate-pulse",
+    wave: "animate-shimmer",
+    none: "",
+  };
 
-    return (
-      <span
-        ref={ref}
-        className={cn(
-          "inline-flex items-center font-medium",
-          variants[variant],
-          sizes[size],
-          className
-        )}
-        {...props}
-      />
-    );
-  }
-);
+  return (
+    <div
+      className={cn(
+        "bg-gray-200",
+        variants[variant],
+        animations[animation],
+        className
+      )}
+      {...props}
+    />
+  );
+}
 
-Badge.displayName = "Badge";
+// Skeleton presets comunes
+export function SkeletonProduct() {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="aspect-product w-full" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-6 w-1/4 mt-4" />
+      </div>
+    </div>
+  );
+}
 
-export default Badge;
+export function SkeletonCard() {
+  return (
+    <div className="border border-gray-200 p-6 space-y-4">
+      <Skeleton className="h-8 w-1/2" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-10 w-full mt-4" />
+    </div>
+  );
+}

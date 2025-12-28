@@ -1,13 +1,13 @@
 // app/checkout/confirmacion/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Package, Mail, ArrowRight } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 
-export default function ConfirmacionPage() {
+function ConfirmacionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isAuthenticated } = useAuthStore();
@@ -170,5 +170,22 @@ export default function ConfirmacionPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ConfirmacionPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="inline-block w-8 h-8 border-4 border-gray-300 border-t-black rounded-full animate-spin mb-4"></div>
+            <p className="text-gray-600">Cargando confirmación...</p>
+          </div>
+        </div>
+      }
+    >
+      <ConfirmacionContent />
+    </Suspense>
   );
 }

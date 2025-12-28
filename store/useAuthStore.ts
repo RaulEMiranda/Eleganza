@@ -23,6 +23,7 @@ interface AuthStore {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  _hasHydrated: boolean; // ✅ NUEVO: Flag de hidratación
 
   // Acciones
   login: (
@@ -34,6 +35,7 @@ interface AuthStore {
   register: (userData: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   initializeAuth: () => () => void;
+  setHasHydrated: (state: boolean) => void; // ✅ NUEVO
 }
 
 // Helper para verificar si es un error de Firebase Auth
@@ -53,6 +55,12 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      _hasHydrated: false, // ✅ NUEVO
+
+      // ✅ NUEVO: Método para marcar como hidratado
+      setHasHydrated: (state: boolean) => {
+        set({ _hasHydrated: state });
+      },
 
       // Login con email y contraseña
       login: async (email: string, password: string, rememberMe: boolean) => {
@@ -339,6 +347,10 @@ export const useAuthStore = create<AuthStore>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      // ✅ NUEVO: Callback cuando termina de hidratar
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

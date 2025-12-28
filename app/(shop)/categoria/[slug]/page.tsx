@@ -11,6 +11,7 @@ import ProductGrid from "@/components/products/ProductGrid";
 import ProductFilters from "@/components/products/ProductFilters";
 import ProductSort from "@/components/products/ProductSort";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
+import CategoryBanner from "@/components/category/CategoryBanner";
 import Button from "@/components/ui/Button";
 
 export default function CategoryPage({
@@ -50,10 +51,9 @@ export default function CategoryPage({
         ]}
       />
 
-      {/* Header */}
-      <div className="mt-6 mb-8">
-        <h1 className="text-4xl font-serif mb-2">{category.name}</h1>
-        <p className="text-gray-600">{category.description}</p>
+      {/* Banner de Categoría */}
+      <div className="mt-6">
+        <CategoryBanner category={category} />
       </div>
 
       {/* Filters & Results */}
@@ -86,7 +86,7 @@ export default function CategoryPage({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Desktop Filters - Con links de categorías */}
+        {/* Desktop Filters */}
         <aside className="hidden lg:block">
           <div className="sticky top-24">
             <ProductFilters

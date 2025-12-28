@@ -1,26 +1,38 @@
 // components/layout/Header.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ShoppingBag, User, Search, Menu, Heart, LogOut } from "lucide-react";
 import { SITE_NAME } from "@/constants";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useCartStore } from "@/store/useCartStore";
 import Navigation from "./Navigation";
 import MobileMenu from "./MobileMenu";
 import SearchBar from "./SearchBar";
+import CartDrawer from "@/components/cart/CartDrawer";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const { user, isAuthenticated, logout } = useAuthStore();
+  const { getItemCount } = useCartStore();
+
+  // Evitar hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
     setShowUserMenu(false);
   };
+
+  const cartItemCount = isMounted ? getItemCount() : 0;
 
   return (
     <>
@@ -72,7 +84,7 @@ export default function Header() {
               {/* Wishlist */}
               <Link
                 href="/lista-deseos"
-                className="hidden sm:block p-2 hover:bg-gray-100 transition-elegant"
+                className="hidden sm:block p-2 hover:bg-gray-100 transition-elegant rounded-md"
                 aria-label="Lista de deseos"
               >
                 <Heart className="w-5 h-5" />
@@ -84,14 +96,14 @@ export default function Header() {
                   <>
                     <button
                       onClick={() => setShowUserMenu(!showUserMenu)}
-                      className="p-2 hover:bg-gray-100 transition-elegant flex items-center gap-2"
+                      className="p-2 hover:bg-gray-100 transition-elegant rounded-md flex items-center gap-2"
                       aria-label="Mi cuenta"
                     >
                       {user?.photoURL ? (
                         <img
                           src={user.photoURL}
                           alt={user.displayName}
-                          className="w-6 h-6 object-cover"
+                          className="w-6 h-6 object-cover rounded-full"
                         />
                       ) : (
                         <User className="w-5 h-5" />
@@ -148,7 +160,7 @@ export default function Header() {
                 ) : (
                   <Link
                     href="/login"
-                    className="p-2 hover:bg-gray-100 transition-elegant"
+                    className="inline-flex p-2 hover:bg-gray-100 transition-elegant rounded-md"
                     aria-label="Iniciar sesión"
                   >
                     <User className="w-5 h-5" />
@@ -157,17 +169,19 @@ export default function Header() {
               </div>
 
               {/* Cart */}
-              <Link
-                href="/carrito"
-                className="relative p-2 hover:bg-gray-100 transition-elegant"
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-2 hover:bg-gray-100 transition-elegant rounded-md"
                 aria-label="Carrito de compras"
               >
                 <ShoppingBag className="w-5 h-5" />
-                {/* Badge de cantidad - esto se conectará con Zustand */}
-                <span className="absolute -top-1 -right-1 bg-black text-white text-xs w-5 h-5 flex items-center justify-center">
-                  0
-                </span>
-              </Link>
+                {/* Badge de cantidad */}
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-black rounded-full text-white text-xs w-5 h-5 flex items-center justify-center">
+                    {cartItemCount > 9 ? "9+" : cartItemCount}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -181,6 +195,9 @@ export default function Header() {
 
       {/* Search Bar */}
       <SearchBar isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 }

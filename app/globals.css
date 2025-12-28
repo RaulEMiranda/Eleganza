@@ -333,6 +333,19 @@
   }
 }
 
+@keyframes slideLeft {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slideLeft {
+  animation: slideLeft 0.3s ease-out;
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-in-out;
 }

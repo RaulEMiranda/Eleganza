@@ -1,28 +1,41 @@
 // app/page.tsx
+"use client";
+
+import BannerPromo from "@/components/home/BannerPromo";
+import FeaturedCategories from "@/components/home/FeaturedCategories";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
+import HeroSection from "@/components/home/HeroSection";
+import NewArrivals from "@/components/home/NewArrivals";
+import Newsletter from "@/components/home/Newlestter";
+import Testimonials from "@/components/home/Testimonials";
+import TrustBadges from "@/components/home/TrustBadges";
 
 export default function HomePage() {
   return (
-    <div className="container-elegant py-20">
-      <div className="text-center space-y-6">
-        <h1 className="text-6xl font-serif">Eleganza</h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Moda elegante y sofisticada para el hombre y la mujer moderna
-        </p>
-        <div className="flex gap-4 justify-center pt-8">
-          <a
-            href="/productos"
-            className="px-8 py-4 bg-black text-white hover:bg-gray-900 transition-elegant font-medium"
-          >
-            Ver Productos
-          </a>
-          <a
-            href="/categoria"
-            className="px-8 py-4 border-2 border-black text-black hover:bg-black hover:text-white transition-elegant font-medium"
-          >
-            Explorar Categorías
-          </a>
-        </div>
-      </div>
-    </div>
+    <main className="min-h-screen">
+      {/* Hero Section - Banner principal */}
+      <HeroSection />
+
+      {/* Trust Badges - Envío gratis, devoluciones, etc. */}
+      <TrustBadges />
+
+      {/* Featured Categories - Categorías destacadas */}
+      <FeaturedCategories />
+
+      {/* Featured Products - Productos destacados */}
+      <FeaturedProducts />
+
+      {/* Banner Promo - Banner de promoción entre secciones */}
+      <BannerPromo />
+
+      {/* New Arrivals - Nuevos productos */}
+      <NewArrivals />
+
+      {/* Testimonials - Reseñas de clientes */}
+      <Testimonials />
+
+      {/* Newsletter - Suscripción al newsletter */}
+      <Newsletter />
+    </main>
   );
 }

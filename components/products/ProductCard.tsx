@@ -5,11 +5,13 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, ShoppingBag } from "lucide-react";
-import { Product } from "@/types";
+import { Product } from "@/types/product";
 import { formatPrice, calculateDiscount } from "@/lib/utils";
 import { useWishlistStore } from "@/store/useWishlistStore";
+import { useCartStore } from "@/store/useCartStore";
 import Badge from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 interface ProductCardProps {
   product: Product;
@@ -17,7 +19,12 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { isInWishlist, addItem, removeItem } = useWishlistStore();
+  const {
+    isInWishlist,
+    addItem: addToWishlist,
+    removeItem: removeFromWishlist,
+  } = useWishlistStore();
+  const { addItem: addToCart } = useCartStore();
   const inWishlist = isInWishlist(product.id);
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -25,9 +32,40 @@ export default function ProductCard({ product }: ProductCardProps) {
     e.stopPropagation();
 
     if (inWishlist) {
-      removeItem(product.id);
+      removeFromWishlist(product.id);
     } else {
-      addItem(product);
+      addToWishlist(product);
+    }
+  };
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Verificar si el producto tiene variantes (tallas o colores)
+    const hasSizes = product.sizes && product.sizes.length > 0;
+    const hasColors = product.colors && product.colors.length > 0;
+
+    if (hasSizes || hasColors) {
+      // Si tiene variantes, redirigir al detalle del producto
+      toast("Por favor selecciona talla y color en la página del producto", {
+        icon: "👉",
+      });
+      // El usuario puede hacer click en el link normalmente
+      return;
+    }
+
+    // Si no tiene variantes, agregar directamente al carrito
+    try {
+      addToCart(
+        product,
+        "", // Sin talla
+        "", // Sin color
+        1 // Cantidad 1
+      );
+      toast.success(`${product.name} agregado al carrito`);
+    } catch (error) {
+      toast.error("Error al agregar al carrito");
     }
   };
 
@@ -36,7 +74,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     : 0;
 
   return (
-    <Link href={`/producto/${product.slug}`} className="group block">
+    <Link href={`/productos/${product.slug}`} className="group block">
       <div className="space-y-3">
         {/* Image Container */}
         <div className="relative aspect-product bg-gray-100 overflow-hidden">
@@ -89,15 +127,19 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Quick Add Button */}
           <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-elegant">
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                // TODO: Abrir quick view o agregar al carrito
-              }}
-              className="w-full bg-black text-white py-3 hover:bg-gray-900 transition-elegant flex items-center justify-center gap-2"
+              onClick={handleQuickAdd}
+              disabled={!product.inStock}
+              className={cn(
+                "w-full py-3 transition-elegant flex items-center justify-center gap-2",
+                product.inStock
+                  ? "bg-black text-white hover:bg-gray-900"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              )}
             >
               <ShoppingBag className="w-4 h-4" />
-              <span className="text-sm font-medium">Agregar al Carrito</span>
+              <span className="text-sm font-medium">
+                {product.inStock ? "Agregar al Carrito" : "Agotado"}
+              </span>
             </button>
           </div>
 

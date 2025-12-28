@@ -1,7 +1,7 @@
 // components/ui/Input.tsx
 "use client";
 
-import { InputHTMLAttributes, forwardRef, useState } from "react";
+import { InputHTMLAttributes, forwardRef, useState, ReactNode } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   helperText?: string;
   fullWidth?: boolean;
+  leftIcon?: ReactNode;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -20,6 +21,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       error,
       helperText,
       fullWidth = false,
+      leftIcon,
       type = "text",
       id,
       ...props
@@ -44,15 +46,22 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
 
         <div className="relative">
+          {leftIcon && (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+              {leftIcon}
+            </div>
+          )}
+
           <input
             ref={ref}
             id={inputId}
             type={inputType}
             className={cn(
-              "w-full px-4 py-3 bg-white border text-foreground transition-elegant",
+              "w-full py-3 bg-white border text-foreground transition-elegant",
               "focus:outline-none focus:border-foreground",
               "disabled:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60",
               error ? "border-red-500 focus:border-red-500" : "border-gray-300",
+              leftIcon ? "pl-11 pr-4" : "px-4",
               isPasswordType && "pr-12", // Espacio para el botón
               className
             )}

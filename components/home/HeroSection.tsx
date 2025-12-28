@@ -13,6 +13,7 @@ interface Slide {
   cta: string;
   ctaLink: string;
   image: string;
+  mobileImage?: string; // Imagen optimizada para móvil
   textPosition: "left" | "center" | "right";
   theme: "light" | "dark";
 }
@@ -27,6 +28,8 @@ const slides: Slide[] = [
     ctaLink: "/categoria/zapatos-mujer",
     image:
       "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&h=1080&fit=crop",
+    mobileImage:
+      "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=1200&fit=crop",
     textPosition: "left",
     theme: "light",
   },
@@ -39,6 +42,8 @@ const slides: Slide[] = [
     ctaLink: "/productos",
     image:
       "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&h=1080&fit=crop",
+    mobileImage:
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=1200&fit=crop",
     textPosition: "center",
     theme: "dark",
   },
@@ -51,6 +56,8 @@ const slides: Slide[] = [
     ctaLink: "/categoria/zapatos-mujer",
     image:
       "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1920&h=1080&fit=crop",
+    mobileImage:
+      "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&h=1200&fit=crop",
     textPosition: "right",
     theme: "light",
   },
@@ -59,6 +66,18 @@ const slides: Slide[] = [
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detectar si es móvil
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Auto-play carousel
   useEffect(() => {
@@ -89,7 +108,7 @@ export default function HeroSection() {
   const slide = slides[currentSlide];
 
   return (
-    <section className="relative h-125 md:h-150 lg:h-175 overflow-hidden bg-gray-100">
+    <section className="relative h-125 sm:h-150 md:h-162.5 lg:h-175 overflow-hidden bg-gray-100">
       {/* Background Image */}
       <div className="absolute inset-0">
         {slides.map((s, index) => (
@@ -99,15 +118,24 @@ export default function HeroSection() {
               index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
           >
+            {/* Imagen Desktop */}
             <img
               src={s.image}
               alt={s.title}
-              className="w-full h-full object-cover"
+              className="hidden md:block w-full h-full object-cover"
             />
-            {/* Overlay */}
+            {/* Imagen Mobile */}
+            <img
+              src={s.mobileImage || s.image}
+              alt={s.title}
+              className="block md:hidden w-full h-full object-cover object-center"
+            />
+            {/* Overlay - más oscuro en móvil para mejor legibilidad */}
             <div
               className={`absolute inset-0 ${
-                s.theme === "dark" ? "bg-black/40" : "bg-white/20"
+                s.theme === "dark"
+                  ? "bg-black/50 md:bg-black/40"
+                  : "bg-black/30 md:bg-white/20"
               }`}
             />
           </div>
@@ -115,7 +143,7 @@ export default function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative h-full container-elegant">
+      <div className="relative h-full container-elegant px-4 sm:px-6">
         <div
           className={`h-full flex items-center ${
             slide.textPosition === "left"
@@ -126,39 +154,52 @@ export default function HeroSection() {
           }`}
         >
           <div
-            className={`max-w-2xl ${
-              slide.textPosition === "center" ? "text-center" : ""
+            className={`max-w-2xl w-full ${
+              slide.textPosition === "center"
+                ? "text-center"
+                : "text-left md:text-left"
             } ${
-              slide.textPosition === "right" ? "text-right" : ""
-            } animate-slideUp`}
+              slide.textPosition === "right" ? "md:text-right" : ""
+            } animate-slideUp px-4 md:px-0`}
           >
+            {/* Subtitle */}
             <p
-              className={`text-sm md:text-base font-medium tracking-wider mb-4 ${
-                slide.theme === "dark" ? "text-white" : "text-gray-800"
+              className={`text-xs sm:text-sm md:text-base font-medium tracking-wider mb-2 sm:mb-3 md:mb-4 uppercase ${
+                slide.theme === "dark" || isMobile
+                  ? "text-white"
+                  : "text-gray-800"
               }`}
             >
               {slide.subtitle}
             </p>
+
+            {/* Title */}
             <h1
-              className={`text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-6 leading-tight ${
-                slide.theme === "dark" ? "text-white" : "text-black"
+              className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-3 sm:mb-4 md:mb-6 leading-tight ${
+                slide.theme === "dark" || isMobile ? "text-white" : "text-black"
               }`}
             >
               {slide.title}
             </h1>
+
+            {/* Description */}
             <p
-              className={`text-base md:text-lg mb-8 max-w-lg ${
-                slide.theme === "dark" ? "text-gray-200" : "text-gray-700"
+              className={`text-sm sm:text-base md:text-lg mb-6 sm:mb-7 md:mb-8 max-w-lg ${
+                slide.theme === "dark" || isMobile
+                  ? "text-gray-100"
+                  : "text-gray-700"
               } ${slide.textPosition === "center" ? "mx-auto" : ""} ${
-                slide.textPosition === "right" ? "ml-auto" : ""
+                slide.textPosition === "right" ? "md:ml-auto" : ""
               }`}
             >
               {slide.description}
             </p>
+
+            {/* CTA Button */}
             <Link
               href={slide.ctaLink}
-              className={`inline-block px-8 py-4 font-medium transition-elegant ${
-                slide.theme === "dark"
+              className={`inline-block px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 text-sm sm:text-base font-medium transition-elegant ${
+                slide.theme === "dark" || isMobile
                   ? "bg-white text-black hover:bg-gray-100"
                   : "bg-black text-white hover:bg-gray-800"
               }`}
@@ -169,32 +210,48 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Navigation Arrows */}
+      {/* Navigation Arrows - Solo desktop */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/80 hover:bg-white flex items-center justify-center transition-elegant backdrop-blur-sm z-10"
+        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/80 hover:bg-white items-center justify-center transition-elegant backdrop-blur-sm z-10"
         aria-label="Slide anterior"
       >
         <ChevronLeft className="w-6 h-6" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/80 hover:bg-white flex items-center justify-center transition-elegant backdrop-blur-sm z-10"
+        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/80 hover:bg-white items-center justify-center transition-elegant backdrop-blur-sm z-10"
         aria-label="Slide siguiente"
       >
         <ChevronRight className="w-6 h-6" />
       </button>
 
+      {/* Navigation Arrows Mobile - Más pequeñas y con mejor posición */}
+      <button
+        onClick={prevSlide}
+        className="md:hidden absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white flex items-center justify-center transition-elegant backdrop-blur-sm z-10 rounded-full"
+        aria-label="Slide anterior"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button
+        onClick={nextSlide}
+        className="md:hidden absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white flex items-center justify-center transition-elegant backdrop-blur-sm z-10 rounded-full"
+        aria-label="Slide siguiente"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
       {/* Dots Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-3 z-10">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
             className={`transition-elegant ${
               index === currentSlide
-                ? "w-12 h-2 bg-white"
-                : "w-2 h-2 bg-white/50 hover:bg-white/70"
+                ? "w-8 sm:w-12 h-1.5 sm:h-2 bg-white"
+                : "w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/50 hover:bg-white/70"
             }`}
             aria-label={`Ir a slide ${index + 1}`}
           />

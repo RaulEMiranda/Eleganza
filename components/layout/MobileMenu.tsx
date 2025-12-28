@@ -75,21 +75,21 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               Inicio
             </Link>
             <Link
-              href="/productos/nuevos"
+              href="/productos"
               onClick={onClose}
               className="block text-base font-medium hover:text-gray-600 transition-elegant"
             >
               Nuevos Productos
             </Link>
             <Link
-              href="/ofertas"
+              href="/categoria/zapatos-mujer"
               onClick={onClose}
               className="block text-base font-medium hover:text-gray-600 transition-elegant"
             >
               Ofertas
             </Link>
             <Link
-              href="/mas-vendidos"
+              href="/sacos-blazers"
               onClick={onClose}
               className="block text-base font-medium hover:text-gray-600 transition-elegant"
             >
@@ -138,13 +138,6 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               className="block text-base hover:text-gray-600 transition-elegant"
             >
               Mis Pedidos
-            </Link>
-            <Link
-              href="/lista-deseos"
-              onClick={onClose}
-              className="block text-base hover:text-gray-600 transition-elegant"
-            >
-              Lista de Deseos
             </Link>
           </div>
         </nav>
